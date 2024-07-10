@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.model.comment.commentDto.CommentDto;
+import ru.practicum.model.comment.commentDto.NewCommentDto;
 import ru.practicum.model.event.EventServiceImpl;
 import ru.practicum.model.event.eventDto.EventFullDto;
 import ru.practicum.model.event.eventDto.NewEventDto;
@@ -45,6 +47,27 @@ public class PrivateController {
         return eventService.getEventByInitiator(userId, eventId);
     }
 
+    @PostMapping("/events/{eventId}/comment")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto createComment(@PathVariable Long eventId,
+                                    @RequestBody NewCommentDto commentDto,
+                                    @PathVariable Long userId) {
+        return eventService.createComment(eventId, commentDto, userId);
+    }
+
+    @PatchMapping("/comment/{commentId}")
+    public CommentDto updateComment(@PathVariable Long commentId,
+                                    @RequestBody NewCommentDto commentDto,
+                                    @PathVariable Long userId) {
+        return eventService.updateCommentByAuthor(commentDto, userId, commentId);
+    }
+
+    @DeleteMapping("/comment/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(@PathVariable Long commentId) {
+        eventService.deleteCommentByAdmin(commentId);
+    }
+
     @PatchMapping("/events/{eventId}")
     public EventFullDto updateEventByUser(@PathVariable Long userId,
                                           @PathVariable Long eventId,
@@ -74,11 +97,6 @@ public class PrivateController {
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequestByUser(@PathVariable Long userId,
                                                     @RequestParam Long eventId) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         return partRequestService.addPartRequest(userId, eventId);
     }
 
